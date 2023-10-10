@@ -14,6 +14,8 @@ type Tree struct {
 
 type Node struct {
 	Parent *Node
+	Left   *Node
+	Right  *Node
 	Hash   []byte
 }
 
@@ -52,7 +54,9 @@ func buildCousins(nodes []*Node) *Node {
 		bb = append(bb, right.Hash...)
 		sha3.ShakeSum256(b, bb)
 		parent := Node{
-			Hash: b,
+			Hash:  b,
+			Left:  left,
+			Right: right,
 		}
 
 		left.Parent = &parent
@@ -82,8 +86,31 @@ func (t Tree) Belongs(hash []byte) bool {
 	return false
 }
 
-func (t Tree) GenerateProof(hash []byte) [][]byte {
-	// FIXME
+type ProofStep struct {
+	Hash []byte
+	Left bool
+}
+
+func (t Tree) GenerateProof(hash []byte) []ProofStep {
+	for _, n := range t.Nodes {
+		if string(n.Hash) != string(hash) {
+			continue
+		}
+		var merkleProof []ProofStep
+		parent := n.Parent
+		nodeHash := hash
+
+		for parent != nil {
+			if string(parent.Right.Hash) == string(nodeHash) {
+				merkleProof = append(merkleProof, ProofStep{Hash: parent.Left.Hash, Left: true})
+			} else {
+				merkleProof = append(merkleProof, ProofStep{Hash: parent.Right.Hash, Left: false})
+			}
+			nodeHash = parent.Hash
+			parent = parent.Parent
+		}
+		return merkleProof
+	}
 	return nil
 }
 

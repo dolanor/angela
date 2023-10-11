@@ -19,7 +19,13 @@ type Node struct {
 	Hash   []byte
 }
 
-func FromContentSlice(content [][]byte) Tree {
+type Content []byte
+
+func FromContentSlice(content []Content) Tree {
+	return buildTree(content)
+}
+
+func buildTree(content []Content) Tree {
 	var nodes []*Node
 	for _, data := range content {
 		b := make([]byte, 64)

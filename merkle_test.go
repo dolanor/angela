@@ -3,7 +3,9 @@ package merkle_test
 import (
 	"testing"
 
+	"github.com/dolanor/hashemo"
 	"github.com/dolanor/merkle"
+	"golang.org/x/crypto/sha3"
 )
 
 func TestFromContentSlice(t *testing.T) {
@@ -29,29 +31,32 @@ func TestFromContentSlice(t *testing.T) {
 }
 
 func TestSendFiles(t *testing.T) {
-	rootHash, err := merkle.SendFiles([]merkle.Content{
+	content := []merkle.Content{
 		[]byte("hello"),
 		[]byte("world"),
 		[]byte("yoyo"),
 		[]byte("zozo"),
 		[]byte("magot"),
-		[]byte("hello"),
-		[]byte("world"),
-		[]byte("yoyo"),
-		[]byte("magot"),
-	})
+	}
+	tree := merkle.FromContentSlice(content)
+	rootHash, err := merkle.SendFiles(content)
 	if err != nil {
 		t.Fatal(err)
 	}
 
 	data := []byte("zozo")
+	b := make([]byte, 64)
+	sha3.ShakeSum256(b, data)
 
-	ok, err := merkle.Verify(rootHash, merkle.Content(data))
-	if err != nil {
-		t.Fatal(err)
+	t.Logf("\n%s", tree)
+	proof := tree.GenerateProof(b)
+
+	for _, p := range proof {
+		t.Logf("proof: %s\n", hashemo.FromBytes(p.Hash)[:4])
 	}
 
-	if !ok {
-		t.Fatal("content not valid: not ok")
+	err = merkle.Verify(rootHash, proof, merkle.Content(data))
+	if err != nil {
+		t.Fatal(err)
 	}
 }

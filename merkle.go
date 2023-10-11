@@ -1,6 +1,7 @@
 package merkle
 
 import (
+	"errors"
 	"fmt"
 
 	"github.com/dolanor/hashemo"
@@ -47,6 +48,33 @@ func buildTree(content []Content) Tree {
 	}
 }
 
+func SendFiles(content []Content) (merkleRootHash []byte, err error) {
+	t := buildTree(content)
+	merkleRootHash = t.Root.Hash
+	// TODO send files
+
+	return merkleRootHash, nil
+}
+
+func Verify(merkleRootHash []byte, proof []ProofStep, content Content) error {
+	hash := make([]byte, 64)
+	sha3.ShakeSum256(hash, content)
+
+	for _, s := range proof {
+		if s.Left {
+			sha3.ShakeSum256(hash, append(s.Hash, hash...))
+		} else {
+			sha3.ShakeSum256(hash, append(hash, s.Hash...))
+		}
+	}
+
+	if string(merkleRootHash) != string(hash) {
+		return errors.New("root hash don't match")
+	}
+
+	return nil
+}
+
 func buildCousins(nodes []*Node) *Node {
 	if len(nodes)%2 != 0 {
 		nodes = append(nodes, nodes[len(nodes)-1])
@@ -76,20 +104,6 @@ func buildCousins(nodes []*Node) *Node {
 
 	n := buildCousins(parents)
 	return n
-}
-
-func (t Tree) Belongs(hash []byte) bool {
-	fmt.Println("======")
-	fmt.Println(hashemo.FromBytes(hash))
-	fmt.Println()
-	for _, v := range t.Nodes {
-		fmt.Println(hashemo.FromBytes(v.Hash))
-		fmt.Println()
-		if string(v.Hash) == string(hash) {
-			return true
-		}
-	}
-	return false
 }
 
 type ProofStep struct {

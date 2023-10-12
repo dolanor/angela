@@ -8,6 +8,8 @@ import (
 	"golang.org/x/crypto/sha3"
 )
 
+var ErrRootHashMismatch = errors.New("root hash don't match")
+
 type Tree struct {
 	Root  *Node
 	Nodes []*Node
@@ -68,7 +70,7 @@ func Verify(merkleRootHash []byte, proof []ProofStep, content Content) error {
 	}
 
 	if string(merkleRootHash) != string(hash) {
-		return errors.New("root hash don't match")
+		return ErrRootHashMismatch
 	}
 
 	return nil

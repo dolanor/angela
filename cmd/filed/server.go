@@ -3,6 +3,7 @@ package main
 import (
 	"errors"
 	"fmt"
+	"log/slog"
 	"sync"
 
 	"github.com/dolanor/angela/merkle"
@@ -15,6 +16,8 @@ var (
 
 type server struct {
 	fileServer FileServer
+
+	logger *slog.Logger
 }
 
 type FileServer struct {

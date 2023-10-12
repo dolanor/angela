@@ -3,8 +3,8 @@ package merkle_test
 import (
 	"testing"
 
+	"github.com/dolanor/angela/merkle"
 	"github.com/dolanor/hashemo"
-	"github.com/dolanor/merkle"
 	"golang.org/x/crypto/sha3"
 )
 

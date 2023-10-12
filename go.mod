@@ -1,4 +1,4 @@
-module github.com/dolanor/merkle
+module github.com/dolanor/angela
 
 go 1.21.0
 

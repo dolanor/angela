@@ -22,6 +22,16 @@ type Node struct {
 
 type Content []byte
 
+func (c Content) Hash() []byte {
+	b := make([]byte, 64)
+	sha3.ShakeSum256(b, c)
+	return b
+}
+
+type Hasher interface {
+	Hash() []byte
+}
+
 func FromContentSlice(content []Content) Tree {
 	return buildTree(content)
 }
@@ -29,10 +39,8 @@ func FromContentSlice(content []Content) Tree {
 func buildTree(content []Content) Tree {
 	var nodes []*Node
 	for _, data := range content {
-		b := make([]byte, 64)
-		sha3.ShakeSum256(b, data)
+		b := data.Hash()
 
-		//		fmt.Printf("hash: %c\n", []rune(hashemo.FromBytes(b))[0])
 		n := Node{
 			Hash: b,
 		}
@@ -48,17 +56,8 @@ func buildTree(content []Content) Tree {
 	}
 }
 
-func SendFiles(content []Content) (merkleRootHash []byte, err error) {
-	t := buildTree(content)
-	merkleRootHash = t.Root.Hash
-	// TODO send files
-
-	return merkleRootHash, nil
-}
-
 func Verify(merkleRootHash []byte, proof []ProofStep, content Content) error {
-	hash := make([]byte, 64)
-	sha3.ShakeSum256(hash, content)
+	hash := content.Hash()
 
 	for _, s := range proof {
 		if s.Left {
@@ -83,10 +82,13 @@ func buildCousins(nodes []*Node) *Node {
 	var parents []*Node
 	for i := 0; i < len(nodes); i += 2 {
 		left, right := nodes[i], nodes[i+1]
+
+		baseHash := left.Hash
+		baseHash = append(baseHash, right.Hash...)
+
 		b := make([]byte, 64)
-		bb := left.Hash
-		bb = append(bb, right.Hash...)
-		sha3.ShakeSum256(b, bb)
+		sha3.ShakeSum256(b, baseHash)
+
 		parent := Node{
 			Hash:  b,
 			Left:  left,

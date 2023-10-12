@@ -2,11 +2,15 @@ package main
 
 import (
 	"errors"
-	"log"
+	"fmt"
 	"sync"
 
 	"github.com/dolanor/angela/merkle"
-	"golang.org/x/crypto/sha3"
+)
+
+var (
+	ErrUnknownBucket       = errors.New("unknown bucket")
+	ErrFileIndexOutOfRange = errors.New("file index out of range")
 )
 
 type server struct {
@@ -24,13 +28,9 @@ type Bucket struct {
 	merkleTree merkle.Tree
 }
 
-type File struct {
-	Data []byte
-}
-
+// StoreFiles stores files in the storage system.
 func (fs *FileServer) StoreFiles(bucketName string, content []merkle.Content) error {
 	t := merkle.FromContentSlice(content)
-	log.Printf("added files:\n%s", t)
 
 	bucket := Bucket{
 		name:       bucketName,
@@ -45,19 +45,19 @@ func (fs *FileServer) StoreFiles(bucketName string, content []merkle.Content) er
 	return nil
 }
 
+// RequestFile extracts a files from the system and generates a merkle proof for this file.
 func (fs *FileServer) RequestFile(bucketName string, fi uint) (merkle.Content, []merkle.ProofStep, error) {
 	bucket, ok := fs.buckets[bucketName]
 	if !ok {
-		return merkle.Content{}, nil, errors.New("unknown bucket")
+		return merkle.Content{}, nil, fmt.Errorf("%q: %w", bucketName, ErrUnknownBucket)
 	}
 
 	if int(fi) >= len(bucket.files) {
-		return merkle.Content{}, nil, errors.New("fi is too big")
+		return merkle.Content{}, nil, fmt.Errorf("%q: %w", fi, ErrFileIndexOutOfRange)
 	}
 
 	content := bucket.files[fi]
-	hash := make([]byte, 64)
-	sha3.ShakeSum256(hash, content)
+	hash := content.Hash()
 	merkleProof := bucket.merkleTree.GenerateProof(hash)
 
 	return content, merkleProof, nil

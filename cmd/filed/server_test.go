@@ -46,6 +46,7 @@ func TestFileServer_RequestFile(t *testing.T) {
 			[]byte("world"),
 			[]byte("data"),
 		}
+
 		tree := merkle.FromContentSlice(content)
 		rootHash := tree.Root.Hash
 

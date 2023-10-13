@@ -1,6 +1,6 @@
 # File Server
 
-## Implementation
+## Implementation log
 
 I started to implement the merkle tree construction as it is the part I never did before and might take more time at first. I had a result quite fast, but no way to test it properly without the merkle proofs.
 
@@ -29,6 +29,10 @@ I split the file storage into a specific FileServer, the handlers handle the HTT
 ---
 
 I used the recent improvement in Docker to use build mounts to allow build without copying and caching modules download + build cache. Thus reducing the build from 10s -> 3s
+
+---
+
+add the client implementation in CLI, using the web API
 
 ---
 

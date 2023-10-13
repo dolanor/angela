@@ -6,3 +6,5 @@ services:
     build:
       dockerfile: ./cmd/filed/Dockerfile
       context: .
+    ports:
+      - 7777:7777

@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"net/url"
 	"os"
+	"path"
 
 	"github.com/dolanor/angela/merkle"
 	"github.com/dolanor/angela/web"
@@ -39,6 +40,14 @@ func main() {
 		Exec:      prepare,
 	}
 
+	getCmd := &ff.Command{
+		Name:      "get",
+		Usage:     "filec get ENDPOINT BUCKET_NAME FILE_NUMBER",
+		ShortHelp: "get the i-th file from the server with the proof",
+		LongHelp:  "ENDPOINT is in the format http://host:port/files",
+		Exec:      get,
+	}
+
 	verifyCmd := &ff.Command{
 		Name:      "verify",
 		Usage:     "filec verify FILE MERKLE_PROOF_FILE MERKLE_ROOT_FILE",
@@ -46,7 +55,7 @@ func main() {
 		Exec:      verify,
 	}
 
-	filecCmd.Subcommands = append(filecCmd.Subcommands, putCmd, prepareCmd, verifyCmd)
+	filecCmd.Subcommands = append(filecCmd.Subcommands, putCmd, prepareCmd, getCmd, verifyCmd)
 
 	err := filecCmd.ParseAndRun(context.Background(), os.Args[1:])
 	if errors.Is(err, ff.ErrHelp) {
@@ -137,6 +146,92 @@ func put(ctx context.Context, args []string) error {
 	return nil
 }
 
+func get(ctx context.Context, args []string) error {
+	if len(args) < 3 {
+		return errors.Join(ff.ErrHelp, errors.New("not enough arguments"))
+	}
+	endpoint := args[0]
+	bucketName := args[1]
+	fileNumberStr := args[2]
+
+	endpointURL, err := url.Parse(endpoint)
+	if err != nil {
+		return err
+	}
+
+	endpointURL.Path = path.Join(endpointURL.Path, bucketName, fileNumberStr)
+
+	resp, err := http.Get(endpointURL.String())
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		return errors.New("getting file failed")
+	}
+
+	var getFileResp web.GetFileResponse
+	err = json.NewDecoder(resp.Body).Decode(&getFileResp)
+	if err != nil {
+		return err
+	}
+
+	err = os.WriteFile(fmt.Sprintf("file-%s.data", fileNumberStr), getFileResp.Content, 0o600)
+	if err != nil {
+		return err
+	}
+
+	var proofJSON bytes.Buffer
+	err = json.NewEncoder(&proofJSON).Encode(getFileResp.Proof)
+	if err != nil {
+		return err
+	}
+
+	err = os.WriteFile(fmt.Sprintf("file-%s.proof", fileNumberStr), proofJSON.Bytes(), 0o600)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func verify(ctx context.Context, args []string) error {
-	return errors.New("not implemented")
+	if len(args) < 3 {
+		return errors.Join(ff.ErrHelp, errors.New("not enough arguments"))
+	}
+
+	merkleRootFilePath := args[0]
+	merkleProofFilePath := args[1]
+	filePath := args[2]
+
+	merkleRootHash, err := os.ReadFile(merkleRootFilePath)
+	if err != nil {
+		return err
+	}
+
+	f, err := os.Open(merkleProofFilePath)
+	if err != nil {
+		return err
+	}
+
+	var merkleProof []merkle.ProofStep
+	err = json.NewDecoder(f).Decode(&merkleProof)
+	if err != nil {
+		return err
+	}
+
+	fileData, err := os.ReadFile(filePath)
+	if err != nil {
+		return err
+	}
+
+	err = merkle.Verify(merkleRootHash, merkleProof, fileData)
+	if err != nil {
+		return err
+	}
+
+	fmt.Printf("file %q is correct\n", filePath)
+
+	return nil
 }

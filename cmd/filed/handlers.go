@@ -44,7 +44,7 @@ func (s *server) handleGetFile(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	response := web.GetFilesResponse{
+	response := web.GetFileResponse{
 		Content: content,
 		Proof:   proof,
 	}

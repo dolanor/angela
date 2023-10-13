@@ -21,6 +21,7 @@ type server struct {
 }
 
 type FileServer struct {
+	logger  *slog.Logger
 	mu      sync.Mutex
 	buckets map[string]Bucket
 }
@@ -34,6 +35,7 @@ type Bucket struct {
 // StoreFiles stores files in the storage system.
 func (fs *FileServer) StoreFiles(bucketName string, content []merkle.Content) error {
 	t := merkle.FromContentSlice(content)
+	fs.logger.Debug("tree:\n" + t.String())
 
 	bucket := Bucket{
 		name:       bucketName,

@@ -14,13 +14,14 @@ func main() {
 		panic(err)
 	}
 
-	logger, err := getLogger(cfg.logFormat)
+	logger, err := getLogger(cfg.logFormat, cfg.logLevel)
 	if err != nil {
 		panic(err)
 	}
 
 	s := server{
 		fileServer: FileServer{
+			logger:  logger,
 			buckets: map[string]Bucket{},
 		},
 

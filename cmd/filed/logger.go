@@ -8,13 +8,19 @@ import (
 
 var ErrWrongLogFormat = errors.New("wrong log handler format")
 
-func getLogger(logFormat string) (*slog.Logger, error) {
+func getLogger(logFormat, logLevel string) (*slog.Logger, error) {
 	var logger *slog.Logger
+	var opts *slog.HandlerOptions
+
+	if logLevel == slog.LevelDebug.String() {
+		opts = &slog.HandlerOptions{Level: slog.LevelDebug}
+	}
+
 	switch logFormat {
 	case "text":
-		logger = slog.New(slog.NewTextHandler(os.Stdout, nil))
+		logger = slog.New(slog.NewTextHandler(os.Stdout, opts))
 	case "json":
-		logger = slog.New(slog.NewJSONHandler(os.Stdout, nil))
+		logger = slog.New(slog.NewJSONHandler(os.Stdout, opts))
 	default:
 		return nil, ErrWrongLogFormat
 	}

@@ -39,7 +39,14 @@ func main() {
 		Exec:      prepare,
 	}
 
-	filecCmd.Subcommands = append(filecCmd.Subcommands, putCmd, prepareCmd)
+	verifyCmd := &ff.Command{
+		Name:      "verify",
+		Usage:     "filec verify FILE MERKLE_PROOF_FILE MERKLE_ROOT_FILE",
+		ShortHelp: "verify the file content with the merkle root file",
+		Exec:      verify,
+	}
+
+	filecCmd.Subcommands = append(filecCmd.Subcommands, putCmd, prepareCmd, verifyCmd)
 
 	err := filecCmd.ParseAndRun(context.Background(), os.Args[1:])
 	if errors.Is(err, ff.ErrHelp) {
@@ -128,4 +135,8 @@ func put(ctx context.Context, args []string) error {
 	}
 
 	return nil
+}
+
+func verify(ctx context.Context, args []string) error {
+	return errors.New("not implemented")
 }

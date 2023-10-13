@@ -8,13 +8,11 @@ import (
 
 var ErrWrongLogFormat = errors.New("wrong log handler format")
 
-func getLogger(logFormat, logLevel string) (*slog.Logger, error) {
+func getLogger(logFormat string) (*slog.Logger, error) {
 	var logger *slog.Logger
 	var opts *slog.HandlerOptions
 
-	if logLevel == slog.LevelDebug.String() {
-		opts = &slog.HandlerOptions{Level: slog.LevelDebug}
-	}
+	opts = &slog.HandlerOptions{Level: slog.LevelDebug}
 
 	switch logFormat {
 	case "text":

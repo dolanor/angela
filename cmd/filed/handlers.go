@@ -5,15 +5,13 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/dolanor/angela/merkle"
+	"github.com/dolanor/angela/web"
 	"github.com/gorilla/mux"
 )
 
 func (s *server) handleCreateFiles(w http.ResponseWriter, r *http.Request) {
-	var request struct {
-		Files      []merkle.Content `json:"files"`
-		BucketName string           `json:"bucket_name"`
-	}
+	var request web.CreateFilesRequest
+
 	err := json.NewDecoder(r.Body).Decode(&request)
 	if err != nil {
 		http.Error(w, "could not decode file list: "+err.Error(), http.StatusBadRequest)
@@ -46,13 +44,11 @@ func (s *server) handleGetFile(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	response := struct {
-		Content []byte
-		Proof   []merkle.ProofStep
-	}{
+	response := web.GetFilesResponse{
 		Content: content,
 		Proof:   proof,
 	}
+
 	err = json.NewEncoder(w).Encode(response)
 	if err != nil {
 		http.Error(w, "could not encode the file data: "+err.Error(), http.StatusInternalServerError)

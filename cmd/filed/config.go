@@ -5,7 +5,6 @@ import "flag"
 type config struct {
 	port      int
 	logFormat string
-	logLevel  string
 }
 
 func loadConfig(args []string) (config, error) {

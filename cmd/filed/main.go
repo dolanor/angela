@@ -14,7 +14,7 @@ func main() {
 		panic(err)
 	}
 
-	logger, err := getLogger(cfg.logFormat, cfg.logLevel)
+	logger, err := getLogger(cfg.logFormat)
 	if err != nil {
 		panic(err)
 	}

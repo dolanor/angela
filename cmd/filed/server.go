@@ -3,6 +3,7 @@ package main
 import (
 	"errors"
 	"fmt"
+	"log"
 	"log/slog"
 	"sync"
 
@@ -35,7 +36,8 @@ type Bucket struct {
 // StoreFiles stores files in the storage system.
 func (fs *FileServer) StoreFiles(bucketName string, content []merkle.Content) error {
 	t := merkle.FromContentSlice(content)
-	fs.logger.Debug("tree:\n" + t.String())
+	// FIXME use of "log" and "slog", might create conflicts
+	log.Println("tree:\n" + t.String())
 
 	bucket := Bucket{
 		name:       bucketName,

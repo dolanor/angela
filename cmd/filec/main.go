@@ -11,8 +11,8 @@ import (
 	"os"
 	"path"
 
+	"github.com/dolanor/angela/api"
 	"github.com/dolanor/angela/merkle"
-	"github.com/dolanor/angela/web"
 	"github.com/peterbourgon/ff/v4"
 	"github.com/peterbourgon/ff/v4/ffhelp"
 )
@@ -123,7 +123,7 @@ func put(ctx context.Context, args []string) error {
 		files = append(files, data)
 	}
 
-	req := web.CreateFilesRequest{
+	req := api.CreateFilesRequest{
 		BucketName: bucketName,
 		Files:      files,
 	}
@@ -171,7 +171,7 @@ func get(ctx context.Context, args []string) error {
 		return errors.New("getting file failed")
 	}
 
-	var getFileResp web.GetFileResponse
+	var getFileResp api.GetFileResponse
 	err = json.NewDecoder(resp.Body).Decode(&getFileResp)
 	if err != nil {
 		return err

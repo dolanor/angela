@@ -5,12 +5,12 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/dolanor/angela/web"
+	"github.com/dolanor/angela/api"
 	"github.com/gorilla/mux"
 )
 
 func (s *server) handleCreateFiles(w http.ResponseWriter, r *http.Request) {
-	var request web.CreateFilesRequest
+	var request api.CreateFilesRequest
 
 	err := json.NewDecoder(r.Body).Decode(&request)
 	if err != nil {
@@ -44,7 +44,7 @@ func (s *server) handleGetFile(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	response := web.GetFileResponse{
+	response := api.GetFileResponse{
 		Content: content,
 		Proof:   proof,
 	}

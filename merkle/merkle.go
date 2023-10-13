@@ -157,7 +157,7 @@ func buildCousinLine(depth int, nodes []*Node) string {
 		if i == 0 {
 			s += fmt.Sprintf("%s", prefix)
 		}
-		s += fmt.Sprintf("%s%s", hashemo.FromBytes(n.Hash[0:1]), middle)
+		s += fmt.Sprintf("%s%s", hashemo.FromBytes(n.Hash[:1]), middle)
 		if i%2 == 0 {
 			if n.Parent == nil {
 				continue

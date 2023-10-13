@@ -1,5 +1,7 @@
 github.com/dolanor/hashemo v0.0.0-20231009105656-40a1cfdec19c h1:VI8EfuP+0X5HtATL8ipsEPRVag9T1J1bhbtutEv8VlI=
 github.com/dolanor/hashemo v0.0.0-20231009105656-40a1cfdec19c/go.mod h1:X+U8dAEIUeTI+MBgGKQhnBoDmoHRypvY/7Qu3ZlPNCQ=
+github.com/dolanor/hashemo v0.1.0 h1:B+uY5u9i0PYj0ob+LsqR+hkAKh8VwcbHg3UaA6l7lOI=
+github.com/dolanor/hashemo v0.1.0/go.mod h1:X+U8dAEIUeTI+MBgGKQhnBoDmoHRypvY/7Qu3ZlPNCQ=
 github.com/gorilla/mux v1.8.0 h1:i40aqfkR1h2SlN9hojwV5ZA91wcXFOvkdNIeFDP5koI=
 github.com/gorilla/mux v1.8.0/go.mod h1:DVbg23sWSpFRCP0SfiEN6jmj59UnW/n46BH5rLB71So=
 github.com/pelletier/go-toml/v2 v2.0.9 h1:uH2qQXheeefCCkuBBSLi7jCiSmj3VRh2+Goq2N7Xxu0=
